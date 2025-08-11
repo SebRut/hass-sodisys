@@ -1,0 +1,8 @@
+{
+  "name": "Sodisys Kindergarten Tracker",
+  "hacs": "1.6.0",
+  "domains": ["device_tracker", "sensor"],
+  "iot_class": "Cloud Polling",
+  "homeassistant": "2022.7.0",
+  "license": "EUPL-1.2"
+}

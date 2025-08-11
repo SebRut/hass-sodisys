@@ -1,0 +1,38 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sodisys Kindergarten Tracker",
+        "description": "Configure your Sodisys kindergarten tracking integration",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "kindergarten_zone": "Kindergarten Zone Name",
+          "timezone": "Kindergarten Timezone",
+          "update_interval": "Update Interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Sodisys. Please check your internet connection and try again.",
+      "invalid_auth": "Invalid username or password. Please check your credentials.",
+      "unknown": "An unexpected error occurred. Please try again."
+    },
+    "abort": {
+      "already_configured": "This Sodisys account is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sodisys Options",
+        "description": "Configure options for your Sodisys integration",
+        "data": {
+          "kindergarten_zone": "Kindergarten Zone Name",
+          "timezone": "Kindergarten Timezone",
+          "update_interval": "Update Interval (seconds)"
+        }
+      }
+    }
+  }
+}
