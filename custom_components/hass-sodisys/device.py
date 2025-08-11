@@ -1,4 +1,5 @@
 """Device utilities for Sodisys integration."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -6,6 +7,7 @@ from typing import Any
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import (
+    ATTR_CHILD_ID,
     DEVICE_MANUFACTURER,
     DEVICE_MODEL_CHILD,
     DEVICE_SW_VERSION,
@@ -14,7 +16,8 @@ from .const import (
 
 
 def create_child_device_info(child_data: dict[str, Any]) -> DeviceInfo:
-    """Create device info for a child device.
+    """
+    Create device info for a child device.
 
     Args:
         child_data: Dictionary containing child information with keys:
@@ -24,8 +27,9 @@ def create_child_device_info(child_data: dict[str, Any]) -> DeviceInfo:
 
     Returns:
         DeviceInfo dictionary for Home Assistant device registry
+
     """
-    unique_id = child_data.get("unique_id", child_data.get("id", "unknown"))
+    unique_id = child_data.get("unique_id", child_data.get(ATTR_CHILD_ID, "unknown"))
     child_name = child_data.get("name", f"Child {unique_id}")
 
     return DeviceInfo(
@@ -34,26 +38,27 @@ def create_child_device_info(child_data: dict[str, Any]) -> DeviceInfo:
         manufacturer=DEVICE_MANUFACTURER,
         model=DEVICE_MODEL_CHILD,
         sw_version=DEVICE_SW_VERSION,
-        # Add suggested area for the child (can be overridden by user)
-        suggested_area="Children",
     )
 
 
 def get_child_device_identifier(child_data: dict[str, Any]) -> str:
-    """Get the device identifier for a child.
+    """
+    Get the device identifier for a child.
 
     Args:
         child_data: Dictionary containing child information
 
     Returns:
         Device identifier string used in Home Assistant device registry
+
     """
-    unique_id = child_data.get("unique_id", child_data.get("id", "unknown"))
+    unique_id = child_data.get("unique_id", child_data.get(ATTR_CHILD_ID, "unknown"))
     return f"child_{unique_id}"
 
 
 def create_entity_unique_id(child_data: dict[str, Any], entity_type: str) -> str:
-    """Create a unique entity ID for a child entity.
+    """
+    Create a unique entity ID for a child entity.
 
     Args:
         child_data: Dictionary containing child information
@@ -61,6 +66,7 @@ def create_entity_unique_id(child_data: dict[str, Any], entity_type: str) -> str
 
     Returns:
         Unique entity ID string
+
     """
-    unique_id = child_data.get("unique_id", child_data.get("id", "unknown"))
+    unique_id = child_data.get("unique_id", child_data.get(ATTR_CHILD_ID, "unknown"))
     return f"sodisys_{entity_type}_{unique_id}"

@@ -1,17 +1,16 @@
 """Config flow for Sodisys integration."""
+
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import voluptuous as vol
-from aiohttp import ClientSession
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from sodisys import Sodisys
 
 from .const import (
     CONF_KINDERGARTEN_ZONE,
@@ -25,6 +24,10 @@ from .const import (
     ERROR_INVALID_AUTH,
     ERROR_UNKNOWN,
 )
+
+if TYPE_CHECKING:
+    from homeassistant.core import HomeAssistant
+    from homeassistant.data_entry_flow import FlowResult
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,17 +45,11 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
-    """Validate the user input allows us to connect.
+    """
+    Validate the user input allows us to connect.
 
     Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
     """
-    try:
-        # Import sodisys here to avoid import errors if package is not installed
-        from sodisys import Sodisys
-    except ImportError as err:
-        _LOGGER.error("Sodisys package not found: %s", err)
-        raise CannotConnect("Sodisys package not installed") from err
-
     session = async_get_clientsession(hass)
     sodisys = Sodisys(session)
 
@@ -60,10 +57,10 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         await sodisys.login(data[CONF_USERNAME], data[CONF_PASSWORD])
         _LOGGER.info("Successfully authenticated with Sodisys")
     except Exception as err:
-        _LOGGER.error("Failed to authenticate with Sodisys: %s", err)
+        _LOGGER.exception("Failed to authenticate with Sodisys")
         if "auth" in str(err).lower() or "login" in str(err).lower():
-            raise InvalidAuth from err
-        raise CannotConnect from err
+            raise InvalidAuthError from err
+        raise CannotConnectError from err
 
     # Return info that you want to store in the config entry.
     return {"title": f"Sodisys ({data[CONF_USERNAME]})"}
@@ -89,9 +86,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 info = await validate_input(self.hass, user_input)
-            except CannotConnect:
+            except CannotConnectError:
                 errors["base"] = ERROR_CANNOT_CONNECT
-            except InvalidAuth:
+            except InvalidAuthError:
                 errors["base"] = ERROR_INVALID_AUTH
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected exception")
@@ -104,11 +101,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
 
-class CannotConnect(HomeAssistantError):
+class CannotConnectError(HomeAssistantError):
     """Error to indicate we cannot connect."""
 
 
-class InvalidAuth(HomeAssistantError):
+class InvalidAuthError(HomeAssistantError):
     """Error to indicate there is invalid auth."""
 
     async def async_step_init(
@@ -148,11 +145,7 @@ class InvalidAuth(HomeAssistantError):
 class SodisysOptionsFlow(config_entries.OptionsFlow):
     """Handle options flow for Sodisys."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
-
-    async def async_step_init(
+    async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Manage the options."""
@@ -176,9 +169,7 @@ class SodisysOptionsFlow(config_entries.OptionsFlow):
                         CONF_TIMEZONE,
                         default=self.config_entry.options.get(
                             CONF_TIMEZONE,
-                            self.config_entry.data.get(
-                                CONF_TIMEZONE, DEFAULT_TIMEZONE
-                            ),
+                            self.config_entry.data.get(CONF_TIMEZONE, DEFAULT_TIMEZONE),
                         ),
                     ): str,
                     vol.Optional(

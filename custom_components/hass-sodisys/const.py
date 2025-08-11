@@ -1,4 +1,5 @@
 """Constants for the Sodisys integration."""
+
 from __future__ import annotations
 
 from typing import Final
@@ -7,7 +8,7 @@ DOMAIN: Final = "sodisys"
 
 # Configuration keys
 CONF_USERNAME: Final = "username"
-CONF_PASSWORD: Final = "password"
+CONF_PASSWORD: Final = "password"  # noqa: S105
 CONF_KINDERGARTEN_ZONE: Final = "kindergarten_zone"
 CONF_UPDATE_INTERVAL: Final = "update_interval"
 CONF_TIMEZONE: Final = "timezone"
@@ -24,6 +25,8 @@ STATE_NOT_HOME: Final = "not_home"
 
 # Attributes
 ATTR_CHILD_ID: Final = "child_id"
+ATTR_NAME: Final = "name"
+ATTR_CHECKED_IN: Final = "checked_in"
 ATTR_CHECK_IN_TIME: Final = "check_in_time"
 ATTR_CHECK_OUT_TIME: Final = "check_out_time"
 ATTR_LAST_UPDATED: Final = "last_updated"
