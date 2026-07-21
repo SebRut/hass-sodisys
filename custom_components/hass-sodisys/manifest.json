@@ -10,9 +10,9 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/sebastian/hass-sodisys/issues",
   "requirements": [
-    "sodisys==0.5.0",
+    "sodisys==0.6.0",
     "aiohttp"
   ],
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "EUPL-1.2"
 }
